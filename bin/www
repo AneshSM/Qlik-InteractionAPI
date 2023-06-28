@@ -14,7 +14,7 @@ var http = require("http");
 
 const connect = require("../helpers/test");
 
-var port = normalizePort(process.env.PORT || "4004");
+var port = normalizePort(process.env.PORT || "8000");
 app.set("port", port);
 
 /**
@@ -86,3 +86,8 @@ function onListening() {
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
 }
+
+// WebSocket Test
+// connect().catch((err) => {
+//   console.log(err);
+// });

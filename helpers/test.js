@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const path = require("path");
 const fs = require("fs");
-const { getApps, openApp } = require("../json/qlikEngine_json");
+const { getApps, openApp, getBookMarks } = require("../json/qlikEngine_json");
 
 // Set certPath to the path to the directory that contains the exported client certificates in PEM format.
 var certPath = path.join(
@@ -38,28 +38,44 @@ module.exports = engineConnect = function () {
   console.log("0. Contacting the QIX Engine service...");
   return new Promise((resolve, reject) => {
     ws.onopen = function (e) {
-      console.log("2. Connected!  WebSocket readyState = " + ws.readyState);
-      // parsing object
-      ws.send(JSON.stringify(openApp()));
+      ws.onmessage = (msg) => {
+        const data = JSON.parse(msg.data);
+        if (data["method"] === "OnConnected") {
+          ws.send(
+            JSON.stringify(openApp("562abc57-fdaa-42a7-be82-a262215f01af"))
+          );
+        } else if (data["error"]) {
+          ws.terminate();
+          reject({
+            data: data["error"].message,
+            message: "error",
+          });
+        } else if (data["result"]) {
+          const { result } = data;
+          if (result["qReturn"]) {
+            console.log("app is opend");
+            ws.send(JSON.stringify(getBookMarks()));
+          } else if (result["qList"]) {
+            const { qList } = result;
+            qList.map((data, index) => {
+              console.log(data.qInfo);
+            });
+          } else {
+            ws.terminate();
+            reject({
+              status: 500,
+              message: "Invalid AppID",
+            });
+          }
+        } else {
+          ws.terminate();
+          resolve(data);
+        }
+      };
     };
     ws.onerror = function (e) {
       console.log("Error: " + e.message);
     };
-
-    // Listen for new messages arriving at the client
-    ws.onmessage = function (e) {
-      console.log("## Message received: " + e.data);
-      fs.appendFile("GetEngineInfo.txt", e.data, function (err) {
-        if (err) {
-          return console.log(err);
-        } else {
-          console.log("GetEngineInfo.txt saved successfully!");
-          //   ws.close();
-          return;
-        }
-      });
-    };
-
     ws.onclose = function (e) {
       console.log("WebSocket closed!");
       resolve();
