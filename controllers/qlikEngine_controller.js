@@ -1,8 +1,12 @@
-const { openApp, getBookMarks, getSheets } = require("../json/qlikEngine_json");
+const {
+  openApp,
+  getBookMarks,
+  getObjects,
+} = require("../json/qlikEngine_json");
 const {
   qEgetAppData,
   qEgetBookmarks,
-  qEgetSheets,
+  qEgetObjects,
 } = require("../helpers/qlikEngine");
 
 const openDoc = async (req) => {
@@ -32,10 +36,21 @@ const fetchBookMarks = async (req, res) => {
 const fetchSheets = async (req, res) => {
   try {
     const ws = await openDoc(req);
-    const sheets = await qEgetSheets(ws, getSheets);
+    const type = ["sheet"];
+    const sheets = await qEgetObjects(ws, getObjects, type);
     res.status(200).send({ status: "OK", data: sheets });
   } catch (error) {
     res.status(error?.status || 400).send({ status: "ERROR2", error: error });
   }
 };
-module.exports = { openDoc, fetchBookMarks, fetchSheets };
+const fetchStories = async (req, res) => {
+  try {
+    const ws = await openDoc(req);
+    const type = ["story"];
+    const stories = await qEgetObjects(ws, getObjects, type);
+    res.status(200).send({ status: "OK", data: stories });
+  } catch (error) {
+    res.status(error?.status || 400).send({ status: "ERROR2", error: error });
+  }
+};
+module.exports = { openDoc, fetchBookMarks, fetchSheets, fetchStories };

@@ -18,14 +18,14 @@ const getBookMarks = () => {
     },
   };
 };
-
-const getSheets = (types) => {
+// parameter array of strings
+const getObjects = (types) => {
   return {
     handle: 1,
     method: "GetObjects",
     params: {
       qOptions: {
-        qTypes: ["sheet"],
+        qTypes: [...types],
         qIncludeSessionObjects: false,
         qData: {},
       },
@@ -33,4 +33,4 @@ const getSheets = (types) => {
   };
 };
 
-module.exports = { openApp, getBookMarks, getSheets };
+module.exports = { openApp, getBookMarks, getObjects };

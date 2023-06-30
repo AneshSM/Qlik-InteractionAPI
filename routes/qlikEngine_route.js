@@ -2,10 +2,12 @@ const express = require("express");
 const {
   fetchBookMarks,
   fetchSheets,
+  fetchStories,
 } = require("../controllers/qlikEngine_controller");
-const { getBookMarks } = require("../json/qlikEngine_json");
-const qlikRouter = express.Router();
+const qERouter = express.Router();
 
-qlikRouter.get("/getApps/:appid/bookmarks", fetchBookMarks);
-qlikRouter.get("/getApps/:appid/sheets", fetchSheets);
-module.exports = qlikRouter;
+qERouter.get("/app/:appid/bookmarks", fetchBookMarks);
+qERouter.get("/app/:appid/sheets", fetchSheets);
+qERouter.get("/app/:appid/stories", fetchStories);
+
+module.exports = qERouter;

@@ -100,10 +100,11 @@ const qEgetBookmarks = (ws, getBookMarks) => {
     }
   });
 };
-const qEgetSheets = (ws, getSheets) => {
+
+const qEgetObjects = (ws, getObjects, types) => {
   return new Promise(async (resolve, reject) => {
     try {
-      ws.send(JSON.stringify(getSheets()));
+      ws.send(JSON.stringify(getObjects(types)));
       ws.onmessage = (msg) => {
         const data = JSON.parse(msg.data);
         if (data["error"]) {
@@ -153,5 +154,4 @@ const qEgetSheets = (ws, getSheets) => {
     }
   });
 };
-
-module.exports = { qEgetAppData, qEgetBookmarks, qEgetSheets };
+module.exports = { qEgetAppData, qEgetBookmarks, qEgetObjects };
