@@ -3,16 +3,18 @@
 /**
  * Module dependencies.
  */
+var qrsInteract = require("qrs-interact");
+
 const fs = require("fs");
 var app = require("../app");
 var debug = require("debug")("engine-api-app:server");
 var http = require("http");
+const { default: axios } = require("axios");
+const { callAxios } = require("../test/test_axios");
 
 /**
  * Get port from environment and store in Express.
  */
-
-const connect = require("../helpers/test");
 
 var port = normalizePort(process.env.PORT || "8000");
 app.set("port", port);
@@ -90,3 +92,5 @@ function onListening() {
 // connect().catch((err) => {
 //   console.log(err);
 // });
+
+// callAxios();

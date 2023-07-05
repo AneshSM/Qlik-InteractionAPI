@@ -1,17 +1,34 @@
 const fs = require("fs");
-const { qrsImportApp, qrsExportApp } = require("../helpers/qlikQRSapp");
-const { storeApp } = require("../helpers/common/helper");
+const path = require("path");
+
+const {
+  qrsImportApp,
+  qrsExportApp,
+  qrsGetImportFolder,
+  qrsDownloadApp,
+  qrsGetExtentions,
+  qrsGetExtention,
+  qrsImportExtention,
+} = require("../helpers/qlikQRSapp");
 
 // *** export specific app
 const exportApp = async (req, res) => {
   try {
     await qrsExportApp().then(async (value) => {
-      await storeApp(JSON.parse(value)).then((data) => {
-        res.status(200).send({
-          status: "OK",
-          data: "Successfully stored",
-          res: JSON.parse(value),
+      const { downloadPath } = JSON.parse(value);
+      await qrsDownloadApp(downloadPath).then((data) => {
+        const filepath = `./demo/export/test.qvf`;
+        fs.openSync(filepath, "w");
+        fs.writeFileSync(path.resolve(filepath), data, function (err) {
+          if (err) {
+            return console.error(err);
+          }
         });
+      });
+      res.status(200).send({
+        status: "OK",
+        data: "Successfully stored",
+        res: JSON.parse(value),
       });
     });
   } catch (error) {
@@ -24,11 +41,56 @@ const exportApp = async (req, res) => {
 // *** import specific app
 const importApp = async (req, res) => {
   try {
-    await qrsImportApp().then((value) => {
-      res.status(200).send({ status: "OK", data: value });
+    await qrsGetImportFolder().then(async (value) => {
+      console.log("Import folder path: " + JSON.parse(value));
+      await qrsImportApp().then((value) => {
+        res.status(200).send({ value });
+      });
     });
   } catch (error) {
     console.log(error);
+    res.status(error?.status || 400).send({ status: "ERROR", error });
   }
 };
-module.exports = { exportApp, importApp };
+
+// *** get availabel extensions
+const getExtensions = async (req, res) => {
+  try {
+    await qrsGetExtentions().then((value) => {
+      res.status(200).send({ value });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(error?.status || 400).send({ status: "ERROR", error });
+  }
+};
+const getExtension = async (req, res) => {
+  try {
+    await qrsGetExtention(req.params.extnId).then((value) => {
+      const { name, owner, customProperties } = value;
+      res
+        .status(200)
+        .send({ extension: { name, owner, customProperties }, meta: value });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(error?.status || 400).send({ status: "ERROR", error });
+  }
+};
+const importExtension = async (req, res) => {
+  try {
+    await qrsImportExtention().then((value) => {
+      res.status(200).send(value);
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(error?.status || 400).send({ status: "ERROR", error });
+  }
+};
+module.exports = {
+  exportApp,
+  importApp,
+  getExtensions,
+  getExtension,
+  importExtension,
+};

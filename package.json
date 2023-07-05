@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/test",
+    "start": "nodemon ./test/test_QRS.js",
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "axios": "^1.4.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -15,6 +16,7 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "qrs": "^2.0.3",
+    "qrs-interact": "^6.3.1",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   },

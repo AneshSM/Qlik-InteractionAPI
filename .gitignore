@@ -2,3 +2,4 @@
 **/config
 **/cert
 config/db.config.js
+**/demo
